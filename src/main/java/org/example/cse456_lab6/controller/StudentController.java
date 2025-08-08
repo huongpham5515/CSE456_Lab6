@@ -38,6 +38,23 @@ public class StudentController {
         model.addAttribute("students", students);
         return "student-list";
     }
+    @GetMapping("/students/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("student", new Student());
+        return "create-student";
+    }
+
+
+    @PostMapping("/students/new")
+    public String createStudent(@ModelAttribute Student student, RedirectAttributes redirectAttributes) {
+        initStudent.getStudentList().add(student);
+        redirectAttributes.addFlashAttribute("pmsg", "Save student successfully");
+        redirectAttributes.addFlashAttribute("pid", student.getStudentID());
+        redirectAttributes.addFlashAttribute("pname", student.getStudentName());
+        redirectAttributes.addFlashAttribute("pyob", student.getYob());
+        redirectAttributes.addFlashAttribute("pgpa", student.getGpa());
+        return "redirect:/student-list";
+    }
 
     @GetMapping("student/edit/{studentId}")
     public String showEditForm(@PathVariable int studentId, Model model){
@@ -76,6 +93,14 @@ public class StudentController {
     public String saveStudent(@ModelAttribute("student") Student student, RedirectAttributes redirectAttributes){
         /*Lay thong tin tur form
          * Hien thi thong tin do len trang result.html*/
+        for (Student s : initStudent.getStudentList()) {
+            if (s.getStudentID() == (student.getStudentID())) {
+                s.setStudentName(student.getStudentName());
+                s.setYob(student.getYob());
+                s.setGpa(student.getGpa());
+                break;
+            }
+        }
         redirectAttributes.addFlashAttribute("pmsg", "Save student successfully");
         redirectAttributes.addFlashAttribute("pid", student.getStudentID());
         redirectAttributes.addFlashAttribute("pname", student.getStudentName());
@@ -84,6 +109,21 @@ public class StudentController {
         return "redirect:/student-list"; //tra ve trang result.html dong thoi doi url thanh /result, chuyen huong url sang /student/edit/result
         //Nen phai co ham xu ly cho url nay
         //Tai sao cho nay khong can Model? Model se duoc gui kem theo trang html cho thymeleaf
+    }
+
+    @GetMapping("/student/delete/{studentId}")
+    public String deleteStudent(@PathVariable int studentId, RedirectAttributes redirectAttributes) {
+        List<Student> students = initStudent.getStudentList();
+
+        boolean removed = students.removeIf(s -> s.getStudentID() == studentId);
+
+        if (removed) {
+            redirectAttributes.addFlashAttribute("pmsg", "Student deleted successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("pmsg", "Student not found");
+        }
+
+        return "redirect:/student-list";
     }
 
 
