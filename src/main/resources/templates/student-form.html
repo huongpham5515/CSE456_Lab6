@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="form-container">
+        <h1 class="mb-4 text-center" style="padding-top: 20px" th:if="${formName == 'edit'}">Edit Student Information</h1>
+        <h1 class="mb-4 text-center" style="padding-top: 20px" th:if="${formName == 'create'}">Create New Student</h1>
+    <form action="/student/form" method="post" th:object="${student}">
+        <div class="mb-3">
+            <label for="id" class="form-label">ID:</label>
+            <input th:field="${student.studentID}" type="text" class="form-control" id="id" th:readonly="${formName == 'edit'}"
+            th:style="${formName} == 'edit' ?'color : grey' : 'color : black'" required>
+            <span th:errors="*{studentID}" style="color: red"></span>
+            <span th:if="${duplicate} != null" th:text="${duplicate}" style="color: red"></span>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input th:field="${student.studentName}" type="text" class="form-control" id="name" required>
+            <span th:errors="*{studentName}" style="color: red"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="yob" class="form-label">YOB:</label>
+            <input th:field="${student.yob}" type="text" class="form-control" id="yob" required>
+            <span th:errors="*{yob}" style="color: red"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="gpa" class="form-label">GPA:</label>
+            <input th:field="${student.gpa}" type="text" class="form-control" id="gpa" required>
+            <span th:errors="*{gpa}" style="color: red"></span>
+        </div>
+        <div class="mb-3">
+            <label for="major" class="form-label">Major:</label>
+            <select id="major" th:field="*{major.majorID}" class="form-select">
+                <option th:each="m : ${majors}"
+                th:value="${m.majorID}" th:text="${m.majorName}">
+                </option>
+            </select>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <input type="hidden" name="formName" th:value="${formName}">
+            <a th:href="@{/student-list}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+    </div>
+</div>
+</body>
+</html>

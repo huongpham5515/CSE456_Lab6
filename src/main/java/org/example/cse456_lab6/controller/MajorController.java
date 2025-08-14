@@ -1,8 +1,7 @@
 package org.example.cse456_lab6.controller;
 
-import org.example.cse456_lab6.config.InitMajor;
 import org.example.cse456_lab6.entity.Major;
-import org.example.cse456_lab6.entity.Student;
+import org.example.cse456_lab6.service.MajorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,27 +13,27 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 @Controller
 public class MajorController {
-    private final InitMajor initMajor;
+    private final MajorService majorService;
 
-    public MajorController(InitMajor initMajor){
-        this.initMajor = initMajor;
+    public MajorController(MajorService majorService){
+        this.majorService = majorService;
     }
     @GetMapping("/major-list")
     public String showMajorList(Model model){
-        List<Major> majors = initMajor.getMajorList();
+        List<Major> majors = majorService.getMajorList();
         model.addAttribute("majors", majors);
         return "major-list";
     }
 
-    @GetMapping("/major/new")
-    public String showCreateForm(Model model) {
-        model.addAttribute("major", new Major());
-        return "create-major";
-    }
+//    @GetMapping("/major/new")
+//    public String showCreateForm(Model model) {
+//        model.addAttribute("major", new Major());
+//        return "create-major";
+//    }
 
     @PostMapping("/major/new")
     public String saveNewMajor(@ModelAttribute Major major, RedirectAttributes redirectAttributes) {
-        initMajor.getMajorList().add(major);
+        majorService.getMajorList().add(major);
         redirectAttributes.addFlashAttribute("pmsg", "Major created successfully");
         redirectAttributes.addFlashAttribute("mid", major.getMajorID());
         redirectAttributes.addFlashAttribute("mname", major.getMajorName());
@@ -43,7 +42,7 @@ public class MajorController {
 
     @GetMapping("/major/edit/{majorId}")
     public String showEditForm(@PathVariable int majorId, Model model) {
-        for (Major m : initMajor.getMajorList()) {
+        for (Major m : majorService.getMajorList()) {
             if (m.getMajorID() == majorId) {
                 model.addAttribute("major", m);
                 break;
@@ -54,7 +53,7 @@ public class MajorController {
 
     @PostMapping("/major/edit")
     public String saveEditedMajor(@ModelAttribute("major") Major major, RedirectAttributes redirectAttributes) {
-        for (Major m : initMajor.getMajorList()) {
+        for (Major m : majorService.getMajorList()) {
             if (m.getMajorID() == major.getMajorID()) {
                 m.setMajorName(major.getMajorName());
                 break;
@@ -69,7 +68,7 @@ public class MajorController {
 
     @GetMapping("/major/delete/{majorId}")
     public String deleteMajor(@PathVariable int majorId, RedirectAttributes redirectAttributes) {
-        boolean removed = initMajor.getMajorList().removeIf(m -> m.getMajorID() == majorId);
+        boolean removed = majorService.getMajorList().removeIf(m -> m.getMajorID() == majorId);
         if (removed) {
             redirectAttributes.addFlashAttribute("pmsg", "Major deleted successfully");
         } else {
